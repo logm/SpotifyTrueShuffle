@@ -1,0 +1,14 @@
+:root {
+	--spotify-green:#1DB954;
+	--spotify-black:#191414;
+	--spotify-white:#FFFFFF;
+}
+
+body {
+	background-color: var(--spotify-black)
+}
+
+.list-group-item.active {
+	background-color: var(--spotify-green);
+	border-color: var(--spotify-green);
+}

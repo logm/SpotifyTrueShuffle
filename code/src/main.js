@@ -176,12 +176,12 @@ async function viewPlaylists()
 	// console.log(playlists)
 	let html = ""
 
-	for (p in playlists)
+	for (p of playlists)
 	{
-		html += '<div class="form-check">	<input class="form-check-input" type="checkbox" value="" id="defaultCheck1" onclick="plChecked(\'' + playlists[p].id + '\')">	<label class="form-check-label" for="defaultCheck1">'
-		html += playlists[p].name
-		// console.log(playlists[p])
-		html += "		</label>		</div>"
+		html += '<a class="list-group-item list-group-item-action" id="pl-' + p.id + '" href="javascript:plChecked(\'' + p.id + '\')">'
+		html += '<img src="' + p.images[0].url + '" class="img-thumbnail" width="50" > '
+		html += p.name
+		html += '</a>'
 	}
 	document.getElementById('playlist_list').innerHTML = html;
 }
@@ -189,72 +189,81 @@ async function viewPlaylists()
 var selectedPlaylists = []
 var selectedSongs = []
 
-function plChecked(pl)
+async function plChecked(plid)
 {
-	// if (document.getElementById('defaultCheck1').checked) {
-	selectedPlaylists.push(pl)
-	// console.log(selectedPlaylists)
 
-	// }
-	// console.log(pl)
-}
 
-function viewSelected()
-{
-	let html = ""
-	// console.log(selectedPlaylists)
-	for (p in selectedPlaylists)
+	if (document.getElementById('pl-' + plid).classList.contains('active'))
 	{
-		html += '<div class="form-check">	<input class="form-check-input" type="checkbox" value="" id="defaultCheck1" onclick="plChecked(\'' + p + '\')">	<label class="form-check-label" for="defaultCheck1">'
-		html += p
-		// console.log(playlists[p])
-		html += "		</label>		</div>"
-	}
-	document.getElementById('selected_playlist_list').innerHTML = html;
-}
-
-async function getSongs()
-{
-	console.log("getSongs")
-	for (i in selectedPlaylists)
+		document.getElementById('pl-' + plid).classList.remove('active')
+		selectedPlaylists = selectedPlaylists.filter(e => e.id != plid)
+	} else
 	{
-		// console.log(selectedPlaylists[i])
+		let url = "https://api.spotify.com/v1/playlists/" + plid
 		let h = {
 			"Accept": "application/json",
 			"Content-Type": "application/json",
 			"Authorization": auth
 		}
-
 		let b = null
-		let tracks = await get('https://api.spotify.com/v1/playlists/' + selectedPlaylists[i] + '/tracks', h, b)
-		console.log(tracks)
-		for (j in tracks.items)
-		{
-			// console.log(tracks.items[j].track.id)
-			selectedSongs.push(tracks.items[j].track.id)
-		}
+		let pl = await get(url, h, b)
+		selectedPlaylists.push(pl)
+		document.getElementById('pl-' + plid).classList.add('active')
+
 	}
-	console.log(selectedSongs)
+
+	// viewSelected()
 }
 
+async function viewSelected()
+{
+	let html = ""
+	// let playlists = await getPlaylists()
+	// console.log(selectedPlaylists)
+	for (p of selectedPlaylists)
+	{
+		html += '<div class="form-check">	<input class="form-check-input" type="checkbox" value="" id="defaultCheck1" onclick="plChecked(\'' + p.id + '\')">	<label class="form-check-label" for="defaultCheck1">'
+		html += p.name
+		console.log(p)
+		html += "		</label>		</div>"
+	}
+	// document.getElementById('selected_playlist_list').innerHTML = html;
+}
 
-// function getAccess() {
-// 	let url = "https://accounts.spotify.com/authorize"
+async function getSongs()
+{
+	console.log("getSongs")
+	for (pl of selectedPlaylists)
+	{
+		for (song of pl.tracks.items)
+		{
+			selectedSongs.push(song)
+		}
+	}
 
-// 	fetch(url, {
-// 			method: "GET",
-// 			headers: {
-// 				"Accept": "application/json",
-// 				"Content-Type": "application/json",
-// 				"Authorization": auth
-// 			}
-// 			body: {
-// 				"grant_type":
-// 			}
-// 	})
-// 	.then((response) => response.json())
-// 	.then((responseJson) => {
-// 		console.log(responseJson);
-// 		console.log(JSON.stringify(responseJson))
-// 	})
-// };
+	viewSongs()
+}
+
+function viewSongs() {
+	html = ""
+	for (song of selectedSongs) {
+		html += '<a class="list-group-item list-group-item-action" id="sn-' + song.track.id + '" href="javascript:snChecked(\'' + song.track.id + '\')">'
+		html += song.track.name
+		html += '</a>'
+	}
+	document.getElementById('selected_song_list').innerHTML = html;
+
+}
+
+function shuffle() {
+	console.log("shuffling")
+	for (var i = selectedSongs.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = selectedSongs[i];
+        selectedSongs[i] = selectedSongs[j];
+        selectedSongs[j] = temp;
+	}
+	console.log(selectedSongs)
+	viewSongs()
+	console.log("done shuffling")
+  }
