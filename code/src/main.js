@@ -17,7 +17,7 @@ if (localStorage.token_expires && new Date().getTime() < new Date(localStorage.t
 	authorize()
 
 }
-
+viewPlaylists()
 
 
 async function authorize()
@@ -175,12 +175,16 @@ async function viewPlaylists()
 	let playlists = await getPlaylists()
 	// console.log(playlists)
 	let html = ""
-
 	for (p of playlists)
 	{
-		html += '<a class="list-group-item list-group-item-action" id="pl-' + p.id + '" href="javascript:plChecked(\'' + p.id + '\')">'
-		html += '<img src="' + p.images[0].url + '" class="img-thumbnail" width="50" > '
-		html += p.name
+		html += '<a class="card card-block playlist_card playlist_card_inactive col-2" id="pl-' + p.id + '" href="javascript:plChecked(\'' + p.id + '\')">'
+		// html += '<div class="card" id="playlist_cards">'
+		html += '<img src="' + p.images[0].url + '" class="card-img-top" alt="...">'
+		html += '<div class="card-body">'
+		html += '<h5 class="card-title">' + p.name + '</h5>'
+		html += '<p class="card-text"><small class="text-muted">' + p.tracks.total + '</small></p>'
+		html += '</div>'
+		// html += '</div>'
 		html += '</a>'
 	}
 	document.getElementById('playlist_list').innerHTML = html;
@@ -193,9 +197,10 @@ async function plChecked(plid)
 {
 
 
-	if (document.getElementById('pl-' + plid).classList.contains('active'))
+	if (document.getElementById('pl-' + plid).classList.contains('playlist_card_active'))
 	{
-		document.getElementById('pl-' + plid).classList.remove('active')
+		document.getElementById('pl-' + plid).classList.remove('playlist_card_active')
+		document.getElementById('pl-' + plid).classList.add('playlist_card_inactive')
 		selectedPlaylists = selectedPlaylists.filter(e => e.id != plid)
 	} else
 	{
@@ -208,31 +213,18 @@ async function plChecked(plid)
 		let b = null
 		let pl = await get(url, h, b)
 		selectedPlaylists.push(pl)
-		document.getElementById('pl-' + plid).classList.add('active')
+		document.getElementById('pl-' + plid).classList.add('playlist_card_active')
+		document.getElementById('pl-' + plid).classList.remove('playlist_card_inactive')
 
 	}
-
-	// viewSelected()
+	getSongs()
 }
 
-async function viewSelected()
-{
-	let html = ""
-	// let playlists = await getPlaylists()
-	// console.log(selectedPlaylists)
-	for (p of selectedPlaylists)
-	{
-		html += '<div class="form-check">	<input class="form-check-input" type="checkbox" value="" id="defaultCheck1" onclick="plChecked(\'' + p.id + '\')">	<label class="form-check-label" for="defaultCheck1">'
-		html += p.name
-		console.log(p)
-		html += "		</label>		</div>"
-	}
-	// document.getElementById('selected_playlist_list').innerHTML = html;
-}
 
 async function getSongs()
 {
 	console.log("getSongs")
+	selectedSongs = []
 	for (pl of selectedPlaylists)
 	{
 		for (song of pl.tracks.items)
@@ -244,9 +236,12 @@ async function getSongs()
 	viewSongs()
 }
 
-function viewSongs() {
+function viewSongs()
+{
+	document.getElementById('selected_song_list').innerHTML = "";
 	html = ""
-	for (song of selectedSongs) {
+	for (song of selectedSongs)
+	{
 		html += '<a class="list-group-item list-group-item-action" id="sn-' + song.track.id + '" href="javascript:snChecked(\'' + song.track.id + '\')">'
 		html += song.track.name
 		html += '</a>'
@@ -255,15 +250,17 @@ function viewSongs() {
 
 }
 
-function shuffle() {
+function shuffle()
+{
 	console.log("shuffling")
-	for (var i = selectedSongs.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1));
-        var temp = selectedSongs[i];
-        selectedSongs[i] = selectedSongs[j];
-        selectedSongs[j] = temp;
+	for (var i = selectedSongs.length - 1; i > 0; i--)
+	{
+		var j = Math.floor(Math.random() * (i + 1));
+		var temp = selectedSongs[i];
+		selectedSongs[i] = selectedSongs[j];
+		selectedSongs[j] = temp;
 	}
 	console.log(selectedSongs)
 	viewSongs()
 	console.log("done shuffling")
-  }
+}

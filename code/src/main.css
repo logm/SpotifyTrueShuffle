@@ -1,14 +1,64 @@
 :root {
-	--spotify-green:#1DB954;
-	--spotify-black:#191414;
-	--spotify-white:#FFFFFF;
+	--spotify-green: #1DB954;
+	--spotify-black: #191414;
+	--spotify-white: #FFFFFF;
 }
 
 body {
-	background-color: var(--spotify-black)
+	background-color: var(--spotify-black);
+	color: var(--spotify-white);
+	overflow: hidden;
+	font-family: Helvetica Neue, helvetica, arial, Hiragino Kaku Gothic Pro, Meiryo, MS Gothic, sans-serif;
 }
 
-.list-group-item.active {
+.playlists {
+	margin-left: 15;
+}
+
+
+.playlists>.card-deck {
+	overflow-x: auto;
+	display: inline-block;
+	white-space: nowrap;
+	-webkit-overflow-scrolling: touch;
+
+}
+
+.playlists ::-webkit-scrollbar {
+	display: none;
+}
+
+.playlist_card {
+	flex: 0 0 100% !important;
+	display: inline-block;
+	white-space: block;
+	margin: 0 !important;
+
+}
+
+.playlist_card {
+	text-decoration: none;
+	color: var(--spotify-white);
+	font-size: smaller;
+	min-width: 150px;
+}
+
+.playlist_card:hover {
+	text-decoration: none;
+}
+
+.playlist_card>.card-body {
+	padding: .2rem !important;
+}
+
+.playlist_card_active {
 	background-color: var(--spotify-green);
 	border-color: var(--spotify-green);
+
+}
+
+.playlist_card_inactive {
+	/* background-color: var(--spotify-white); */
+	background: none;
+
 }

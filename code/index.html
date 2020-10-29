@@ -25,9 +25,6 @@
 	<button class="btn btn-primary"" onclick=" viewPlaylists()">
 		get playlists
 	</button>
-	<button class="btn btn-primary"" onclick=" viewSelected()">
-		get selected playlists
-	</button>
 	<button class="btn btn-primary"" onclick=" getSongs()">
 		get songs
 	</button>
@@ -35,16 +32,26 @@
 		shuffle
 	</button>
 
+	<h2>Your Playlists</h2>
+	<div class="row playlists">
+		<div class="card-deck" id="playlist_list">
+
+		</div>
+
+	</div>
 	<div class="container">
 		<div class="row">
-		  <div class="col-sm" id="playlist_list">
-		  </div>
-		  <!-- <div class="col-sm" id="selected_playlist_list">
-		  </div> -->
-		  <div class="col-sm " id="selected_song_list">
-		  </div>
+			<!-- https://sachinchoolur.github.io/lightslider/ -->
 		</div>
-	  </div>
+		<div class="row">
+			<!-- <div class="col-sm" id="playlist_list"> -->
+			<!-- </div> -->
+			<!-- <div class="col-sm" id="selected_playlist_list">
+		  </div> -->
+			<div class="col-sm " id="selected_song_list">
+			</div>
+		</div>
+	</div>
 	<!-- <div id="playlist_list"> </div>
 	<div id="selected_playlist_list"> </div> -->
 	<script type="text/javascript" src="src/secrets.js"></script>
