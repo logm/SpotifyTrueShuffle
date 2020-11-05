@@ -2,13 +2,23 @@
 	--spotify-green: #1DB954;
 	--spotify-black: #191414;
 	--spotify-white: #FFFFFF;
+	--spotify-grey: #1f1c1c;
 }
 
 body {
 	background-color: var(--spotify-black);
 	color: var(--spotify-white);
-	overflow: hidden;
+	overflow-x: hidden;
 	font-family: Helvetica Neue, helvetica, arial, Hiragino Kaku Gothic Pro, Meiryo, MS Gothic, sans-serif;
+}
+
+#auth_button {
+	margin: .4rem;
+}
+
+
+.top-playlists {
+	background: var(--spotify-black);
 }
 
 .playlists {
@@ -32,15 +42,12 @@ body {
 	flex: 0 0 100% !important;
 	display: inline-block;
 	white-space: block;
-	margin: 0 !important;
-
-}
-
-.playlist_card {
 	text-decoration: none;
 	color: var(--spotify-white);
 	font-size: smaller;
 	min-width: 150px;
+	margin: 4 !important;
+	padding: 3px;
 }
 
 .playlist_card:hover {
@@ -48,7 +55,7 @@ body {
 }
 
 .playlist_card>.card-body {
-	padding: .2rem !important;
+	padding: .1rem !important;
 }
 
 .playlist_card_active {
@@ -61,4 +68,26 @@ body {
 	/* background-color: var(--spotify-white); */
 	background: none;
 
+}
+
+
+.footer-area {
+	background: var(--spotify-black);
+	padding-top: .5rem;
+	min-height: 3.5rem;
+}
+
+.footer-area > .progress > .progress-bar {
+	background-color: var(--spotify-green);
+
+}
+
+#selected_song_list {
+	padding-bottom: 4rem;
+
+}
+
+.now_playing_progress {
+	color: var(--spotify-green);
+	width: 90%;
 }

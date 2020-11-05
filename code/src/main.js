@@ -10,14 +10,18 @@ if (localStorage.token_expires && new Date().getTime() < new Date(localStorage.t
 {
 	console.log("already authd")
 	auth = localStorage.auth;
-	document.getElementById("auth_button").classList.add('btn-success')
 } else
 {
 	console.log("need to auth")
-	authorize()
+	auth = authorize()
 
 }
+
+
+
+
 viewPlaylists()
+updateFooter()
 
 
 async function authorize()
@@ -49,7 +53,7 @@ async function authorize()
 	{
 		console.log("auth exists")
 	}
-	document.getElementById("auth_button").classList.add('btn-success')
+
 	return auth
 }
 
@@ -154,7 +158,7 @@ function playerCommand(str)
 
 async function getPlaylists()
 {
-	let url = "https://api.spotify.com/v1/me/playlists"
+	let url = "	https://api.spotify.com/v1/me"
 	let h = {
 		"Accept": "application/json",
 		"Content-Type": "application/json",
@@ -162,6 +166,14 @@ async function getPlaylists()
 	}
 
 	let b = null
+	let user = await get(url, h, b)
+	document.getElementById("auth_button").classList.add('btn-outline-success')
+	document.getElementById("auth_button").classList.remove('btn-primary')
+	document.getElementById("auth_button").innerHTML =  user.display_name
+
+
+
+	url = "https://api.spotify.com/v1/me/playlists"
 	let playlists = await get(url, h, b)
 	// console.log(playlists)
 	let items = playlists.items
@@ -179,10 +191,10 @@ async function viewPlaylists()
 	{
 		html += '<a class="card card-block playlist_card playlist_card_inactive col-2" id="pl-' + p.id + '" href="javascript:plChecked(\'' + p.id + '\')">'
 		// html += '<div class="card" id="playlist_cards">'
-		html += '<img src="' + p.images[0].url + '" class="card-img-top" alt="...">'
+		html += '<img src="' + p.images[0].url + '" class="card-img-top border-0" alt="...">'
 		html += '<div class="card-body">'
 		html += '<h5 class="card-title">' + p.name + '</h5>'
-		html += '<p class="card-text"><small class="text-muted">' + p.tracks.total + '</small></p>'
+		html += '<p class="card-text"><span class="badge badge-pill badge-secondary">' + p.tracks.total + '</span></p>'
 		html += '</div>'
 		// html += '</div>'
 		html += '</a>'
@@ -264,3 +276,25 @@ function shuffle()
 	viewSongs()
 	console.log("done shuffling")
 }
+
+async function updateFooter() {
+	let url = "https://api.spotify.com/v1/me/player"
+	let h = {
+		"Accept": "application/json",
+		"Content-Type": "application/json",
+		"Authorization": auth
+	}
+
+	let b = null
+	let playback = await get(url, h, b)
+
+	// document.getElementsByClassName('progress-bar').att
+
+
+
+
+}
+
+setInterval(function() {
+	updateFooter()
+},10000);
