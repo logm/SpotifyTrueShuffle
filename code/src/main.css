@@ -84,6 +84,10 @@ body {
 	background: var(--spotify-grey);
 }
 
+#sn-null {
+	color: dimgrey!important;
+}
+
 
 .footer-area {
 	background: var(--spotify-black);

@@ -65,10 +65,11 @@ async function get(url, h, b)
 		body: b
 	})
 	let rs = await response
-	if (rs) {
+	if (rs)
+	{
 		return rs.json()
 	}
-	return  null
+	return null
 	// .then((response) => response.json())
 	// .then((responseJson) =>
 	// {
@@ -86,11 +87,6 @@ async function post(url, h, b)
 		headers: h,
 		body: b
 	})
-	let rs = await response
-	if (rs) {
-		return rs.json()
-	}
-	return  null
 }
 
 async function put(url, h, b)
@@ -135,7 +131,7 @@ function pause()
 	let b = null
 	put(url, h, b)
 	html = ""
-	html +=  '<button type="button" class="btn" onclick="play()">'
+	html += '<button type="button" class="btn" onclick="play()">'
 	html += '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">'
 	html += '<path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" /></svg></button>'
 
@@ -157,30 +153,14 @@ function play()
 
 	let b = null
 	put(url, h, b)
-	// document.getElementsByClassName("pause_toggle")[0].classList.remove("invisible")
-	// document.getElementsByClassName("pause_toggle")[0].classList.add("visible")
-	// document.getElementsByClassName("play_toggle")[0].classList.remove("visible")
 	html = ""
 	html += '<button type="button" class="btn" onclick="pause()">'
 	html += '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pause-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">'
-	html +=	'<path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/> </svg></button>'
-document.getElementsByClassName("play_toggle")[0].innerHTML = html
+	html += '<path d="M5.5 3.5A1.5 1.5 0 0 1 7 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5zm5 0A1.5 1.5 0 0 1 12 5v6a1.5 1.5 0 0 1-3 0V5a1.5 1.5 0 0 1 1.5-1.5z"/> </svg></button>'
+	document.getElementsByClassName("play_toggle")[0].innerHTML = html
 
 }
 
-
-function playerCommand(str)
-{
-	let url = "https://api.spotify.com/v1/me/player/" + str
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
-
-	let b = null
-	post(url, h, b)
-}
 
 async function getPlaylists()
 {
@@ -280,7 +260,17 @@ function viewSongs()
 	html = ""
 	for (song of selectedSongs)
 	{
-		html += '<a class="list-group-item list-group-item-action" id="sn-' + song.track.id + '" href="javascript:snChecked(\'' + song.track.id + '\')">'
+		// html += '<a class="list-group-item list-group-item-action" id="sn-' + song.track.id + '" href="javascript:snChecked(\'' + song.track.id + '\')">'
+
+		html += '<a class="list-group-item list-group-item-action" '
+		if (song.track.is_local == false)
+		{
+			html += 'id="sn-' + song.track.id + ' " href="javascript:snChecked(\'' + song.track.id + '\')">'
+		} else
+		{
+			html += 'id="sn-' + song.track.id + '" href=#">'
+
+		}
 		html += song.track.name
 		html += '</a>'
 	}
@@ -288,19 +278,50 @@ function viewSongs()
 
 }
 
+
+function snChecked(id)
+{
+	console.log(id)
+	let url = "https://api.spotify.com/v1/me/player/queue"
+	let h = {
+		"Accept": "application/json",
+		"Content-Type": "application/json",
+		"Authorization": auth,
+	}
+	b = null
+	url += '?uri=spotify%3Atrack%3A' + id
+	post(url, h, b)
+}
+
+
 function shuffle()
 {
 	console.log("shuffling")
-	for (var i = selectedSongs.length - 1; i > 0; i--)
+	for (let i = selectedSongs.length - 1; i >= 0; i--)
 	{
-		var j = Math.floor(Math.random() * (i + 1));
-		var temp = selectedSongs[i];
+		const j = Math.floor(Math.random() * (i + 1));
+		const temp = selectedSongs[i];
 		selectedSongs[i] = selectedSongs[j];
 		selectedSongs[j] = temp;
 	}
 	console.log(selectedSongs)
 	viewSongs()
 	console.log("done shuffling")
+}
+
+
+async function clearQueue() {
+	console.log("clearing")
+}
+
+
+async function addToQueue() {
+	for (let i = selectedSongs.length - 1; i >= 0; i--)
+	{
+		if (selectedSongs[i].track.is_local == false)
+			snChecked(selectedSongs[i].track.id)
+	}
+
 }
 
 
@@ -317,7 +338,12 @@ async function updateFooter()
 
 	let b = null
 	let playback = await get(url, h, b)
-	if (playback.is_playing == false) {
+	if (playback == null)
+	{
+		return
+	}
+	if (playback.is_playing == false)
+	{
 		return
 	}
 	// console.log(playback)
@@ -334,4 +360,4 @@ async function updateFooter()
 setInterval(function ()
 {
 	updateFooter()
-}, 10000);
+}, 5000);
