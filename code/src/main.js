@@ -1,8 +1,7 @@
+
+
 var auth = ""
-
-
-var client_id = secrets_client_id
-var redirect_uri = secrets_redirect_uri
+var client_id = ""
 
 
 console.log(Date(localStorage.token_expires))
@@ -10,111 +9,138 @@ if (localStorage.token_expires && new Date().getTime() < new Date(localStorage.t
 {
 	console.log("already authd")
 	auth = localStorage.auth;
+	client_id = localStorage.client_id
 } else
 {
 	console.log("need to auth")
-	auth = authorize()
+	window.open('/auth/index.html', '_self')
+	// auth = authorize()
 
 }
 
-
+auth = localStorage.auth
 
 
 viewPlaylists()
 
 
-async function authorize()
-{
-	if (auth === "")
-	{
-
-		let scope = "user-modify-playback-state user-read-playback-state playlist-read-private playlist-read-collaborative streaming user-read-email"
-
-		let url = 'https://accounts.spotify.com/authorize';
-		url += '?response_type=token';
-		url += '&client_id=' + encodeURIComponent(client_id);
-		url += '&redirect_uri=' + encodeURIComponent(redirect_uri);
-		url += '&scope=' + encodeURIComponent(scope);
-		popup = window.open(url, "mywindow", "width=350,height=250");
-		await new Promise(r => setTimeout(r, 1000));
-		// console.log(popup.location.href)
-		let auth_token = popup.location.href.split("=")[1].split("&")[0];
-		// console.log(auth)
-		let token_type = popup.location.href.split('=')[2].split("&")[0];
-		// console.log(token_type)
-		auth = token_type + " " + auth_token
-		console.log(auth)
-		let now = new Date()
-		now.setSeconds(now.getSeconds() + 3600)
-		localStorage.setItem("auth", auth)
-		localStorage.setItem("token_expires", now)
-		location.reload()
-	} else
-	{
-		console.log("auth exists")
-	}
-
-	return auth
-}
 
 async function get(url, h, b)
 {
-	let response = await fetch(url, {
+	if (!url)
+	{
+		Error("No URL given - get()")
+	}
+	if (!h)
+	{
+		h = {
+			"Accept": "application/json",
+			"Content-Type": "application/json",
+			"Authorization": auth
+		}
+	}
+	return fetch(url, {
 		method: "GET",
 		headers: h,
 		body: b
-	})
-	let rs = await response
-	if (rs)
+	}).then(response =>
 	{
-		return rs.json()
-	}
-	return null
-	// .then((response) => response.json())
-	// .then((responseJson) =>
-	// {
-	// 	console.log(responseJson);
-	// 	// console.log(JSON.stringify(responseJson))
-	// 	return responseJson
-	// })
+		if (!response.ok)
+		{
+			response.json()
+				.then(error_json =>
+				{
+					throw (error_json.error.status + " " + error_json.error.message)
+				})
+				.catch(error => { throw error });
+
+			// throw Error('Data received - Network response NOT OK');
+		}
+		return response.json()
+			.then(data =>
+			{
+				// console.log(data)
+				return data
+			})
+			.catch(error => { throw error });
+	}).catch(error => Error(error));
 }
+
 
 async function post(url, h, b)
 {
-
-	let response = await fetch(url, {
+	if (!url)
+	{
+		Error("No URL given - post()")
+	}
+	if (!h)
+	{
+		h = {
+			"Accept": "application/json",
+			"Content-Type": "application/json",
+			"Authorization": auth
+		}
+	}
+	fetch(url, {
 		method: "POST",
 		headers: h,
 		body: b
-	})
+	}).then(response =>
+	{
+		if (!response.ok)
+		{
+			response.json()
+				.then(error_json =>
+				{
+					throw (error_json.error.status + " " + error_json.error.message)
+				})
+				.catch(error => { throw error });
+			// throw Error('Data received - Network response NOT OK');
+		}
+
+	}).catch(error => Error(error));
 }
 
 async function put(url, h, b)
 {
-	let response = await fetch(url, {
+	if (!url)
+	{
+		Error("No URL given - put()")
+	}
+	if (!h)
+	{
+		h = {
+			"Accept": "application/json",
+			"Content-Type": "application/json",
+			"Authorization": auth
+		}
+	}
+
+
+	fetch(url, {
 		method: "PUT",
 		headers: h,
 		body: b
-	})
-	await response
-	// let rs = await response
-	// if (rs) {
-	// 	return rs.json()
-	// }
-	// return  null
+	}).then(response =>
+	{
+		if (!response.ok)
+		{
+			response.json()
+				.then(error_json =>
+				{
+					throw Error(error_json.error.status + " " + error_json.error.message)
+				})
+				.catch(error => { throw error });
+			// throw Error('Data received - Network response NOT OK');
+		}
+
+	}).catch(error => Error(error));
 }
 
 function next()
 {
 	let url = "https://api.spotify.com/v1/me/player/next"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
-
-	let b = null
-	post(url, h, b)
+	post(url, null, null)
 
 }
 
@@ -122,14 +148,7 @@ function next()
 function pause()
 {
 	let url = "https://api.spotify.com/v1/me/player/pause"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
-
-	let b = null
-	put(url, h, b)
+	put(url, null, null)
 	html = ""
 	html += '<button type="button" class="btn" onclick="play()">'
 	html += '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-play-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">'
@@ -145,14 +164,7 @@ function pause()
 function play()
 {
 	let url = "https://api.spotify.com/v1/me/player/play"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
-
-	let b = null
-	put(url, h, b)
+	put(url, null, null)
 	html = ""
 	html += '<button type="button" class="btn" onclick="pause()">'
 	html += '<svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pause-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">'
@@ -165,14 +177,8 @@ function play()
 async function getPlaylists()
 {
 	let url = "	https://api.spotify.com/v1/me"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
+	let user = await get(url, null, null)
 
-	let b = null
-	let user = await get(url, h, b)
 	document.getElementById("auth_button").classList.add('btn-outline-success')
 	document.getElementById("auth_button").classList.remove('btn-primary')
 	document.getElementById("auth_button").innerHTML = user.display_name
@@ -180,7 +186,7 @@ async function getPlaylists()
 
 
 	url = "https://api.spotify.com/v1/me/playlists"
-	let playlists = await get(url, h, b)
+	let playlists = await get(url, null, null)
 	// console.log(playlists)
 	let items = playlists.items
 	// console.log(items)
@@ -223,19 +229,14 @@ async function plChecked(plid)
 	} else
 	{
 		let url = "https://api.spotify.com/v1/playlists/" + plid
-		let h = {
-			"Accept": "application/json",
-			"Content-Type": "application/json",
-			"Authorization": auth
-		}
-		let b = null
-		let pl = await get(url, h, b)
+
+		let pl = await get(url, null, null)
 		selectedPlaylists.push(pl)
 		document.getElementById('pl-' + plid).classList.add('playlist_card_active')
 		document.getElementById('pl-' + plid).classList.remove('playlist_card_inactive')
 
 	}
-	getSongs()
+	viewSongs()
 }
 
 
@@ -251,11 +252,11 @@ async function getSongs()
 		}
 	}
 
-	viewSongs()
 }
 
 function viewSongs()
 {
+	getSongs()
 	document.getElementById('selected_song_list').innerHTML = "";
 	html = ""
 	for (song of selectedSongs)
@@ -283,14 +284,8 @@ function snChecked(id)
 {
 	console.log(id)
 	let url = "https://api.spotify.com/v1/me/player/queue"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth,
-	}
-	b = null
 	url += '?uri=spotify%3Atrack%3A' + id
-	post(url, h, b)
+	post(url, null, null)
 }
 
 
@@ -310,12 +305,14 @@ function shuffle()
 }
 
 
-async function clearQueue() {
+async function clearQueue()
+{
 	console.log("clearing")
 }
 
 
-async function addToQueue() {
+async function addToQueue()
+{
 	for (let i = selectedSongs.length - 1; i >= 0; i--)
 	{
 		if (selectedSongs[i].track.is_local == false)
@@ -330,14 +327,8 @@ async function updateFooter()
 	now = Date.now()
 	console.log("now playing request")
 	let url = "https://api.spotify.com/v1/me/player/currently-playing"
-	let h = {
-		"Accept": "application/json",
-		"Content-Type": "application/json",
-		"Authorization": auth
-	}
 
-	let b = null
-	let playback = await get(url, h, b)
+	let playback = await get(url, null, null)
 	if (playback == null)
 	{
 		return
