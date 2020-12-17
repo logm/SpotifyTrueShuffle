@@ -105,7 +105,7 @@ body {
 	color: var(--spotify-green);
 }
 
-.footer-area>.row>.btn-group > .play_toggle{?}  .btn{
+.footer-area>.row>.btn-group > .play_toggle?  .btn{
 	color: var(--spotify-green);
 }
 
