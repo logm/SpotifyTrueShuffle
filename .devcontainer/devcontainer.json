@@ -1,0 +1,14 @@
+{
+	"name": "React VS Code Remote Container",
+    "dockerFile": "Dockerfile",
+    "appPort": 3000,
+    "extensions": [
+		"jawandarajbir.react-vscode-extension-pack",
+		"angryobject.react-pure-to-class-vscode"
+	],
+    "settings": {
+        "terminal.integrated.shell.linux": "/bin/zsh"
+    },
+	// "postCreateCommand": "npm start --prefix code/"
+	// "postAttachCommand": "npm start --prefix code/"
+}
