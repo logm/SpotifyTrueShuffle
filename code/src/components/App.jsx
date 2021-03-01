@@ -1,5 +1,5 @@
 import React from 'react';
-import { Top } from './spotify-components';
+import { Main } from './spotify-components';
 import {Auth, ClientId} from './Auth'
 
 export default class App extends React.Component
@@ -48,7 +48,7 @@ export default class App extends React.Component
 			<div>
 				{this.state.client_id === "" && <ClientId client_id={this.state.client_id} handle_client_id_change={this.handle_client_id_change}/>}
 			{this.state.client_id}
-				{(this.check_is_auth() && this.state.client_id !== "") && <Top /> }
+				{(this.check_is_auth() && this.state.client_id !== "") && <Main /> }
 				{!this.check_is_auth() && <Auth client_id={this.state.client_id}/> }
 			</div>
 		)

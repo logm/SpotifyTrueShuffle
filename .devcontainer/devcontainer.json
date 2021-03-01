@@ -4,7 +4,11 @@
     "appPort": 3000,
     "extensions": [
 		"jawandarajbir.react-vscode-extension-pack",
-		"angryobject.react-pure-to-class-vscode"
+		"angryobject.react-pure-to-class-vscode",
+		"anseki.vscode-color",
+		"visualstudioexptteam.vscodeintellicode",
+		"eamodio.gitlens"
+
 	],
     "settings": {
         "terminal.integrated.shell.linux": "/bin/zsh"
