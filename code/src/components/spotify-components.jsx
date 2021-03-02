@@ -1,6 +1,7 @@
 import React from 'react';
 // import { get, post, put } from '../js/httpRequests';
-import { get } from '../js/httpRequests';
+import { get,post } from '../js/httpRequests';
+
 
 export class Main extends React.Component
 {
@@ -70,15 +71,20 @@ export class Main extends React.Component
 	render()
 	{
 		return (
-			<div className="container-fluid sticky-top mx-2 py-5 top-playlists">
-				<h1>Hello { this.state.username }</h1>
-				<div className="row playlists">
-					{ this.state.playlists.length > 0 && <Playlists playlists={ this.state.playlists } selectedPlaylist={ this.selectedPlaylist } /> }
+			<div>
+				<div className="container-fluid sticky-top mx-2 py-5 top-playlists">
+					<h1>Hello { this.state.username }</h1>
+					<div className="row playlists">
+						{ this.state.playlists.length > 0 && <Playlists playlists={ this.state.playlists } selectedPlaylist={ this.selectedPlaylist } /> }
+					</div>
 				</div>
-				<SongList songs={this.state.songs} />
-				{/* <Playlists playlists={this.state.playlists} /> */ }
-				{/* <NotWorking /> */ }
+				<div className="container overflow-auto">
+					<div className="row overflow-auto">
+						<SongList songs={ this.state.songs } />
+					</div>
+				</div>
 			</div>
+
 		);
 	}
 }
@@ -153,7 +159,6 @@ export class SongList extends React.Component
 		super(props)
 
 	}
-
 	render()
 	{
 		if (this.state === undefined)
@@ -163,21 +168,44 @@ export class SongList extends React.Component
 			)
 		}
 		return (
-			<div>
-				{/* <h4>my playlists</h4> */}
+				<div className="col-sm overflow-auto" id="selected_song_list">
 				{this.props.songs.map((s) =>
 				{
 					return (
-						<div>
-							{console.log(s)}
-							<h6>
-								{s.track.name}
-							</h6>
-						</div>
-						// <Playlist id={ p.id } name={ p.name } artwork={ p.images[0].url } total={ p.tracks.total } selectedPlaylist={ this.props.selectedPlaylist } />
+						<Song name={ s.track.name } id={ s.track.id } is_local={ s.track.is_local } />
 					)
 				}) }
-			</div>
+				</div>
 		)
+	}
+}
+
+export class Song extends React.Component
+{
+	constructor(props)
+	{
+		super(props)
+		this.handleClick = this.handleClick.bind(this);
+	}
+
+	handleClick()
+	{
+		if (this.props.is_local) {
+			return
+		} else {
+			let url = "https://api.spotify.com/v1/me/player/queue"
+			url += '?uri=spotify%3Atrack%3A' + this.props.id
+			post(url, null, null)
+		}
+	}
+	render()
+	{
+
+		return (
+			<a className="list-group-item list-group-item-action" id={this.props.is_local ? "sn-null" : ""} href="#" onClick={ this.handleClick }>{ this.props.name }</a>
+			// {!this.props.local && <a className="list-group-item list-group-item-action"  href="#" onClick={ this.handleClick }>{ this.props.name }</a>}
+
+		)
+
 	}
 }
