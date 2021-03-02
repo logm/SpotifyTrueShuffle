@@ -95,6 +95,10 @@ body {
 	min-height: 4rem;
 }
 
+.footer-area>.progress {
+	height: 1px;
+}
+
 .footer-area>.progress>.progress-bar {
 	background-color: var(--spotify-green);
 
@@ -105,7 +109,7 @@ body {
 	color: var(--spotify-green);
 }
 
-.footer-area>.row>.btn-group > .play_toggle?  .btn{
+.footer-area>.row>.btn-group >.btn{
 	color: var(--spotify-green);
 }
 
