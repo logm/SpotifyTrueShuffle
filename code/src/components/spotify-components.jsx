@@ -337,11 +337,7 @@ export class NowPlayingFooter extends React.Component
 		let url = "https://api.spotify.com/v1/me/player/currently-playing"
 
 		let playback = await get(url, null, null)
-		if (playback == null)
-		{
-			return
-		}
-		if (playback.is_playing === false)
+		if (playback == null || playback.is_playing === false || playback.item === undefined || playback.item === undefined)
 		{
 			return
 		}
