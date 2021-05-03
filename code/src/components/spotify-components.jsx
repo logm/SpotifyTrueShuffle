@@ -90,13 +90,13 @@ export class Main extends React.Component
 	{
 		return (
 			<div>
-				<div className="container-fluid sticky-top mx-2 py-5">
+				<div className="container-fluid sticky-top mx-2 pt-5 spotify-top">
 					<h1>Hello { this.state.username }</h1>
 					<div className="row playlists">
 						{ this.state.playlists.length > 0 && <Playlists playlists={ this.state.playlists } selectedPlaylist={ this.selectedPlaylist } selectedPlaylistList={ this.state.selectedPlaylists } /> }
 					</div>
 				</div>
-				<div className="container overflow-hidden">
+				<div className="container overflow-hidden pt-4">
 					<div className="row overflow-hidden">
 						<SongList songs={ this.state.songs } />
 					</div>
@@ -110,12 +110,6 @@ export class Main extends React.Component
 
 export class Playlists extends React.Component
 {
-	constructor (props)
-	{
-		super(props)
-	}
-
-
 	render()
 	{
 		return (
@@ -123,7 +117,7 @@ export class Playlists extends React.Component
 				{this.props.playlists.map((p) =>
 				{
 					return (
-						<Playlist id={ p.id } name={ p.name } artwork={ p.images[0].url } total={ p.tracks.total } selectedPlaylist={ this.props.selectedPlaylist } />
+						<Playlist key={ p.id } id={ p.id } name={ p.name } artwork={ p.images[0].url } total={ p.tracks.total } selectedPlaylist={ this.props.selectedPlaylist } />
 					)
 				}) }
 			</div>
@@ -155,7 +149,7 @@ export class Playlist extends React.Component
 	{
 
 		return (
-			<a className={ `card card-block playlist_card col-4 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } id={ this.props.id } href="#" onClick={ this.handleClick }>
+			<div className={ `card card-block playlist_card col-5 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } id={ this.props.id } onClick={ this.handleClick }>
 				<img src={ this.props.artwork } className="card-img-top border-0" alt="..." />
 				<div className="card-body">
 					<h5 className="card-title">{ this.props.name }</h5>
@@ -163,7 +157,7 @@ export class Playlist extends React.Component
 						<span className="badge badge-pill badge-secondary">{ this.props.total }</span>
 					</p>
 				</div>
-			</a>
+			</div>
 		)
 
 	}
@@ -171,18 +165,14 @@ export class Playlist extends React.Component
 
 export class SongList extends React.Component
 {
-	constructor (props)
-	{
-		super(props)
-	}
 	render()
 	{
 		return (
-			<div className="col-sm overflow-auto" id="selected_song_list">
+			<div className="col-sm" id="selected_song_list">
 				{Array.from(this.props.songs).map((s) =>
 				{
 					return (
-						<Song name={ s.track.name } id={ s.track.id } is_local={ s.track.is_local } />
+						<Song key={ s.track.uri } name={ s.track.name } id={ s.track.id } is_local={ s.track.is_local } />
 					)
 				}) }
 			</div>
@@ -215,7 +205,7 @@ export class Song extends React.Component
 	render()
 	{
 		return (
-			<a className="list-group-item list-group-item-action" id={ this.props.is_local ? "sn-null" : "" } href="#" onClick={ this.handleClick }>{ this.props.name }</a>
+			<span className="list-group-item list-group-item-action" id={ this.props.is_local ? "sn-local" : "sn-available" } onClick={ this.handleClick }>{ this.props.name }</span>
 
 		)
 

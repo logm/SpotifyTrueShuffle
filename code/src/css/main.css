@@ -1,111 +1,123 @@
 :root {
-  --spotify-green: #1db954;
-  --spotify-black: #191414;
-  --spotify-white: #ffffff;
-  --spotify-grey: #1f1c1c;
+    --spotify-green: #1db954;
+    --spotify-black: #191414;
+    --spotify-white: #ffffff;
+    --spotify-grey: #1f1c1c;
 }
 
 body {
-  background-color: var(--spotify-black);
-  color: var(--spotify-white);
-  overflow-x: hidden;
-  font-family: Helvetica Neue, helvetica, arial, Hiragino Kaku Gothic Pro,
-    Meiryo, MS Gothic, sans-serif;
+    background-color: var(--spotify-black);
+    color: var(--spotify-white);
+    overflow-x: hidden;
+    font-family: Helvetica Neue, helvetica, arial, Hiragino Kaku Gothic Pro, Meiryo, MS Gothic, sans-serif;
+}
+
+body::-webkit-scrollbar {
+    display: none;
 }
 
 #auth_button {
-  margin: 0.4rem;
+    margin: 0.4rem;
 }
 
 .playlists {
-  margin-left: 15;
-  background-color: var(--spotify-black);
+    margin-left: 15;
+    background-color: var(--spotify-black);
 }
 
-.playlists > .card-deck {
-  overflow-x: auto;
-  display: inline-block;
-  white-space: nowrap;
-  -webkit-overflow-scrolling: touch;
+.playlists>.card-deck {
+    overflow-x: auto;
+    display: inline-block;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
 }
 
 .playlists ::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .playlist_card {
-  flex: 0 0 100% !important;
-  display: inline-block;
-  white-space: block;
-  text-decoration: none;
-  color: var(--spotify-white);
-  /* font-size: smaller; */
-  min-width: 200px;
-  /* min-width: 18%; */
-  /* max-width: 350px; */
-  margin: 4 !important;
-  padding: 3px;
+    flex: 0 0 100% !important;
+    display: inline-block;
+    white-space: block;
+    text-decoration: none;
+    color: var(--spotify-white);
+    /* font-size: smaller; */
+    /* min-width: 200px; */
+    /* min-width: 18%; */
+    /* max-width: 350px; */
+    margin: 4 !important;
+    padding: 3px;
+    cursor: pointer;
+    border: none;
 }
 
 .playlist_card:hover {
-  text-decoration: none;
+    text-decoration: none;
 }
 
-.playlist_card > .card-body {
-  padding: 0.1rem !important;
+.playlist_card>.card-body {
+    padding: 0.1rem !important;
 }
 
 .playlist_card_active {
-  background-color: var(--spotify-green);
-  border-color: var(--spotify-green);
+    background-color: var(--spotify-green);
 }
 
 .playlist_card_inactive {
-  /* background-color: var(--spotify-white); */
-  background: none;
+    /* background-color: var(--spotify-white); */
+    background: none;
 }
 
 #selected_song_list {
-  padding-bottom: 4rem;
+    padding-bottom: 4rem;
 }
 
 #selected_song_list::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
-#selected_song_list > .list-group-item {
-  color: var(--spotify-white);
-  background: var(--spotify-grey);
+#selected_song_list>.list-group-item {
+    color: var(--spotify-white);
+    background: var(--spotify-grey);
 }
 
-#sn-null {
-  color: dimgrey !important;
+#sn-local {
+    color: dimgrey !important;
+}
+
+#sn-available {
+    cursor: pointer;
 }
 
 .footer-area {
-  background: var(--spotify-black);
-  padding-top: 0.5rem;
-  min-height: 4rem;
+    background: var(--spotify-black);
+    padding-top: 0.5rem;
+    min-height: 4rem;
 }
 
-.footer-area > .progress {
-  height: 1px;
+.footer-area>.progress {
+    height: 1px;
 }
 
-.footer-area > .progress > .progress-bar {
-  background-color: var(--spotify-green);
+.footer-area>.progress>.progress-bar {
+    background-color: var(--spotify-green);
 }
 
 .now_playing_progress {
-  color: var(--spotify-green);
+    color: var(--spotify-green);
 }
 
-.footer-area > .row > .btn-group > .btn {
-  color: var(--spotify-green);
+.footer-area>.row>.btn-group>.btn {
+    color: var(--spotify-green);
 }
 
 .auth {
-  width: 100%;
-  max-width: 330px;
-  margin: auto;
+    width: 100%;
+    max-width: 330px;
+    margin: auto;
+}
+
+.spotify-top {
+    background-color: var(--spotify-black);
 }
