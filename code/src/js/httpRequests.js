@@ -1,42 +1,17 @@
-export async function get(url, h, b)
+export async function get(url)
 {
 	if (!url)
 	{
-		Error("No URL given - get()")
+		throw Error("No URL given")
 	}
-	if (!h)
-	{
-		h = {
-			"Accept": "application/json",
-			"Content-Type": "application/json",
-			"Authorization": localStorage.auth
-		}
+	let h = {
+		"Accept": "application/json",
+		"Content-Type": "application/json",
+		"Authorization": localStorage.auth
 	}
-	return fetch(url, {
-		method: "GET",
-		headers: h,
-		body: b
-	}).then(response =>
-	{
-		if (!response.ok)
-		{
-			response.json()
-				.then(error_json =>
-				{
-					throw new Error(error_json.error.status + " " + error_json.error.message)
-				})
-				.catch(error => { throw error });
+	return fetch(url, { method: "GET", headers: h }).then(handleResponse)
 
-			// throw Error('Data received - Network response NOT OK');
-		}
-		return response.json()
-			.then(data =>
-			{
-				// console.log(data)
-				return data
-			})
-			.catch(error => { throw error });
-	}).catch(error => Error(error));
+
 }
 
 
@@ -44,7 +19,7 @@ export async function post(url, h, b)
 {
 	if (!url)
 	{
-		Error("No URL given - post()")
+		throw Error("No URL given")
 	}
 	if (!h)
 	{
@@ -54,31 +29,14 @@ export async function post(url, h, b)
 			"Authorization": localStorage.auth
 		}
 	}
-	fetch(url, {
-		method: "POST",
-		headers: h,
-		body: b
-	}).then(response =>
-	{
-		if (!response.ok)
-		{
-			response.json()
-				.then(error_json =>
-				{
-					throw new Error(error_json.error.status + " " + error_json.error.message)
-				})
-				.catch(error => { throw error });
-			// throw Error('Data received - Network response NOT OK');
-		}
-
-	}).catch(error => Error(error));
+	return fetch(url, { method: "POST", headers: h, body: b }).then(handleResponse)
 }
 
 export async function put(url, h, b)
 {
 	if (!url)
 	{
-		Error("No URL given - put()")
+		throw Error("No URL given")
 	}
 	if (!h)
 	{
@@ -88,24 +46,22 @@ export async function put(url, h, b)
 			"Authorization": localStorage.auth
 		}
 	}
+	return fetch(url, { method: "PUT", headers: h, body: b }).then(handleResponse)
+}
 
 
-	fetch(url, {
-		method: "PUT",
-		headers: h,
-		body: b
-	}).then(response =>
+function handleResponse(response)
+{
+	return response.text().then(text =>
 	{
+		const data = text && JSON.parse(text)
+
 		if (!response.ok)
 		{
-			response.json()
-				.then(error_json =>
-				{
-					throw Error(error_json.error.status + " " + error_json.error.message)
-				})
-				.catch(error => { throw error });
-			// throw Error('Data received - Network response NOT OK');
+			const error = (data && data.message) || response.statusText
+			return Promise.reject(error)
 		}
 
-	}).catch(error => Error(error));
+		return data
+	})
 }

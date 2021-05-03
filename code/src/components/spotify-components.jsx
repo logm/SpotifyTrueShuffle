@@ -1,5 +1,4 @@
 import React from 'react'
-// import { get, post, put } from '../js/httpRequests';
 import { get, post, put } from '../js/httpRequests'
 
 
@@ -20,6 +19,7 @@ export class Main extends React.Component
 	}
 
 
+
 	componentDidMount()
 	{
 		this.getPlaylists()
@@ -38,7 +38,6 @@ export class Main extends React.Component
 			username: user.display_name,
 		})
 	}
-
 
 	async selectedPlaylist(plid)
 	{
@@ -79,20 +78,25 @@ export class Main extends React.Component
 			songs: tmpSongList
 		})
 	}
-
+	componentDidCatch(error, info)
+	{
+		console.log("maaaain")
+		console.log(error)
+		console.log(info)
+	}
 
 	render()
 	{
 		return (
 			<div>
-				<div className="container-fluid sticky-top mx-2 py-5 top-playlists">
+				<div className="container-fluid sticky-top mx-2 py-5">
 					<h1>Hello { this.state.username }</h1>
 					<div className="row playlists">
 						{ this.state.playlists.length > 0 && <Playlists playlists={ this.state.playlists } selectedPlaylist={ this.selectedPlaylist } selectedPlaylistList={ this.state.selectedPlaylists } /> }
 					</div>
 				</div>
-				<div className="container overflow-auto">
-					<div className="row overflow-auto">
+				<div className="container overflow-hidden">
+					<div className="row overflow-hidden">
 						<SongList songs={ this.state.songs } />
 					</div>
 				</div>
@@ -150,7 +154,7 @@ export class Playlist extends React.Component
 	{
 
 		return (
-			<a className={ `card card-block playlist_card  col-4 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } id={ this.props.id } href="#" onClick={ this.handleClick }>
+			<a className={ `card card-block playlist_card col-4 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } id={ this.props.id } href="#" onClick={ this.handleClick }>
 				<img src={ this.props.artwork } className="card-img-top border-0" alt="..." />
 				<div className="card-body">
 					<h5 className="card-title">{ this.props.name }</h5>
@@ -191,6 +195,7 @@ export class Song extends React.Component
 	{
 		super(props)
 		this.handleClick = this.handleClick.bind(this)
+
 	}
 
 	handleClick()
@@ -250,10 +255,9 @@ export class NowPlayingFooter extends React.Component
 		this.state = {
 			nowPlayingName: "Not Playing",
 			nowPlayingWidth: '0%',
-			// nowPlayingWidth: 'width: 0%',
 			playButtonStatus: playButton,
 			playButton: playButton,
-			pauseButton: pauseButton
+			pauseButton: pauseButton,
 		}
 	}
 
@@ -264,7 +268,12 @@ export class NowPlayingFooter extends React.Component
 	// 	- look for device before trying to play
 	// - reconfigure playlist heights at various screen widths
 
-
+	componentDidCatch(error, info)
+	{
+		console.log("yooyoo")
+		console.log(error)
+		console.log(info)
+	}
 
 
 	next()
@@ -285,10 +294,18 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("pause")
 		let url = "https://api.spotify.com/v1/me/player/pause"
-		put(url, null, null)
-		this.setState({
-			playButtonStatus: this.state.pauseButton
-		})
+		try
+		{
+			put(url, null, null)
+			this.setState({
+				playButtonStatus: this.state.pauseButton
+			})
+		} catch (error)
+		{
+			console.log("asd")
+			console.log(error + " pause error")
+			// throw error
+		}
 	}
 
 
@@ -296,10 +313,18 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("play")
 		let url = "https://api.spotify.com/v1/me/player/play"
-		put(url, null, null)
-		this.setState({
-			playButtonStatus: this.state.playButton
-		})
+		try
+		{
+			put(url, null, null)
+			this.setState({
+				playButtonStatus: this.state.playButton
+			})
+		} catch (error)
+		{
+			console.log("fgd")
+			throw error
+			// if (error instanceof )
+		}
 	}
 
 
@@ -335,27 +360,51 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("now playing request")
 		let url = "https://api.spotify.com/v1/me/player/currently-playing"
-
-		let playback = await get(url, null, null)
-		if (playback == null || playback.is_playing === false || playback.item === undefined || playback.item === undefined)
+		let playback = null
+		let width = this.state.width
+		try
 		{
-			return
+			playback = await get(url, null, null)
+			width = playback.progress_ms / playback.item.duration_ms * 100
+			width = width + '%'
+			this.setState({
+				nowPlayingWidth: width,
+				nowPlayingName: playback.item.name,
+			})
+
+		} catch (error)
+		{
+			if (error instanceof TypeError)
+			{
+				//not playing right now
+				//TODO: change delay to reduce api calls
+				// console.log("Type error in update updateFooter")
+				this.setState({
+					playButtonStatus: this.state.pauseButton,
+					nowPlayingName: "Not Playing"
+				})
+
+			} else if (error === "")
+			{
+				console.log("error is weird")
+			} else
+			{
+				console.log("blah blah")
+				throw error
+			}
 		}
-		let width = playback.progress_ms / playback.item.duration_ms * 100
-		// width = 'width: ' + width + '%'
-		width = width + '%'
-		this.setState({
-			nowPlayingWidth: width,
-			nowPlayingName: playback.item.name
-		})
+
 	}
+
 
 	componentDidMount()
 	{
+		console.log("componentDidMount")
 		this.interval = setInterval(() => this.updateFooter(), 1000)
 	}
 	componentWillUnmount()
 	{
+		console.log("componentWillUnmount")
 		clearInterval(this.interval)
 	}
 

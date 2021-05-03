@@ -46,14 +46,21 @@ export default class App extends React.Component
 
 	render()
 	{
-		return (
-			<div>
-				{this.state.client_id === "" && <ClientId client_id={ this.state.client_id } handle_client_id_change={ this.handle_client_id_change } /> }
-				{this.state.client_id }
-				{(this.check_is_auth() && this.state.client_id !== "") && <Main /> }
-				{!this.check_is_auth() && <Auth client_id={ this.state.client_id } /> }
-			</div>
-		)
-
+		if (this.state.client_id === "")
+		{
+			return (
+				<ClientId client_id={ this.state.client_id } handle_client_id_change={ this.handle_client_id_change } />
+			)
+		} else if (this.check_is_auth())
+		{
+			return (
+				<Main />
+			)
+		} else
+		{
+			return (
+				<Auth client_id={ this.state.client_id } />
+			)
+		}
 	}
 }
