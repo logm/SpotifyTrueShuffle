@@ -90,8 +90,8 @@ export class Main extends React.Component
 	{
 		return (
 			<div>
-				<div className="container-fluid sticky-top mx-2 pt-5 spotify-top">
-					<h1>Hello { this.state.username }</h1>
+				<div className="container-fluid sticky-top mx-2 pt-md-5 spotify-top">
+					{/* <h1>Hello { this.state.username }</h1> */ }
 					<div className="row playlists">
 						{ this.state.playlists.length > 0 && <Playlists playlists={ this.state.playlists } selectedPlaylist={ this.selectedPlaylist } selectedPlaylistList={ this.state.selectedPlaylists } /> }
 					</div>
@@ -114,7 +114,7 @@ export class Playlists extends React.Component
 	{
 		return (
 			<div className="card-deck" id="playlist_list">
-				{this.props.playlists.map((p) =>
+				{ this.props.playlists.map((p) =>
 				{
 					return (
 						<Playlist key={ p.id } id={ p.id } name={ p.name } artwork={ p.images[0].url } total={ p.tracks.total } selectedPlaylist={ this.props.selectedPlaylist } />
@@ -169,7 +169,7 @@ export class SongList extends React.Component
 	{
 		return (
 			<div className="col-sm" id="selected_song_list">
-				{Array.from(this.props.songs).map((s) =>
+				{ Array.from(this.props.songs).map((s) =>
 				{
 					return (
 						<Song key={ s.track.uri } name={ s.track.name } id={ s.track.id } is_local={ s.track.is_local } />
@@ -205,7 +205,7 @@ export class Song extends React.Component
 	render()
 	{
 		return (
-			<span className="list-group-item list-group-item-action" id={ this.props.is_local ? "sn-local" : "sn-available" } onClick={ this.handleClick }>{ this.props.name }</span>
+			<span className="list-group-item list-group-item-action user-select-none" id={ this.props.is_local ? "sn-local" : "sn-available" } onClick={ this.handleClick }>{ this.props.name }</span>
 
 		)
 

@@ -1,0 +1,11 @@
+version: '2'
+services:
+    trueshuffle:
+        build: .devcontainer
+        volumes:
+            - ./code:/code/
+        ports:
+            - "3000:3000"
+        command: npm start --prefix code/
+    # redis:
+    #     image: redis

@@ -8,4 +8,5 @@ RUN yarn global add eslint
 
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 
-CMD ["npm start --prefix code/"]
+CMD ["npm install --prefix code/"]
+# CMD ["npm start --prefix code/"]

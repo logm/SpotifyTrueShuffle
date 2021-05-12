@@ -108,9 +108,7 @@ body::-webkit-scrollbar {
     color: var(--spotify-green);
 }
 
-.footer-area>.row>.btn-group>.btn {
-    color: var(--spotify-green);
-}
+
 
 .auth {
     width: 100%;
@@ -120,4 +118,11 @@ body::-webkit-scrollbar {
 
 .spotify-top {
     background-color: var(--spotify-black);
+}
+
+
+ .spotify-buttons {
+    color: var(--spotify-green);
+	font-size: large;
+
 }
