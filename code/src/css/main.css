@@ -16,10 +16,6 @@ body::-webkit-scrollbar {
     display: none;
 }
 
-#auth_button {
-    margin: 0.4rem;
-}
-
 .playlists {
     margin-left: 15;
     background-color: var(--spotify-black);
@@ -69,24 +65,24 @@ body::-webkit-scrollbar {
     background: none;
 }
 
-#selected_song_list {
+.selected_song_list {
     padding-bottom: 4rem;
 }
 
-#selected_song_list::-webkit-scrollbar {
+.selected_song_list::-webkit-scrollbar {
     display: none;
 }
 
-#selected_song_list>.list-group-item {
+.selected_song_list>.list-group-item {
     color: var(--spotify-white);
     background: var(--spotify-grey);
 }
 
-#sn-local {
+.sn-local {
     color: dimgrey !important;
 }
 
-#sn-available {
+.sn-available {
     cursor: pointer;
 }
 

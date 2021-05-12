@@ -19,6 +19,7 @@ export class NowPlayingFooter extends React.Component
 		this.clearQueue = this.clearQueue.bind(this)
 		this.addToQueue = this.addToQueue.bind(this)
 		this.updateFooter = this.updateFooter.bind(this)
+		this.spotifyExceptions = this.spotifyExceptions.bind(this)
 
 		var playButton = (
 			<button type="button" className="btn" onClick={ this.pause }>
@@ -27,7 +28,7 @@ export class NowPlayingFooter extends React.Component
 		)
 
 		var pauseButton = (
-			<button button type="button" className="btn" onClick={ this.play }>
+			<button type="button" className="btn" onClick={ this.play }>
 				<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-play-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 					<path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z" /></svg></button>
 		)
@@ -36,7 +37,7 @@ export class NowPlayingFooter extends React.Component
 		this.state = {
 			nowPlayingName: "Not Playing",
 			nowPlayingWidth: '0%',
-			playButtonStatus: playButton,
+			playButtonStatus: true,
 			playButton: playButton,
 			pauseButton: pauseButton,
 		}
@@ -59,14 +60,14 @@ export class NowPlayingFooter extends React.Component
 	next()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null)
+		post(url, null, null).catch(e => this.spotifyExceptions(e))
 
 	}
 
 	previous()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null)
+		post(url, null, null).catch(e => this.spotifyExceptions(e))
 
 	}
 
@@ -74,18 +75,12 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("pause")
 		let url = "https://api.spotify.com/v1/me/player/pause"
-		try
-		{
-			put(url, null, null)
-			this.setState({
-				playButtonStatus: this.state.pauseButton
-			})
-		} catch (error)
-		{
-			console.log("asd")
-			console.log(error + " pause error")
-			// throw error
-		}
+
+		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		this.setState({
+			playButtonStatus: true
+		})
+
 	}
 
 
@@ -93,18 +88,11 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("play")
 		let url = "https://api.spotify.com/v1/me/player/play"
-		try
-		{
-			put(url, null, null)
-			this.setState({
-				playButtonStatus: this.state.playButton
-			})
-		} catch (error)
-		{
-			console.log("fgd")
-			throw error
-			// if (error instanceof )
-		}
+		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		this.setState({
+			playButtonStatus: false
+		})
+
 	}
 
 
@@ -135,6 +123,23 @@ export class NowPlayingFooter extends React.Component
 		console.log("adding to queue")
 	}
 
+	spotifyExceptions(exception)
+	{
+		console.log("spotifyExceptions")
+		console.log(exception)
+
+		if (exception === "Player command failed: No active device found")
+		{
+			console.log("player not found")
+			//do a popup to prompt user for device selection
+		} else
+		{
+			console.log("uncaught exception" + exception)
+			throw exception
+		}
+
+	}
+
 
 	async updateFooter()
 	{
@@ -144,7 +149,7 @@ export class NowPlayingFooter extends React.Component
 		let width = this.state.width
 		try
 		{
-			playback = await get(url, null, null)
+			playback = await get(url, null, null).catch(e => this.spotifyExceptions(e))
 			width = playback.progress_ms / playback.item.duration_ms * 100
 			width = width + '%'
 			this.setState({
@@ -160,7 +165,7 @@ export class NowPlayingFooter extends React.Component
 				//TODO: change delay to reduce api calls
 				// console.log("Type error in update updateFooter")
 				this.setState({
-					playButtonStatus: this.state.pauseButton,
+					playButtonStatus: false,
 					nowPlayingName: "Not Playing"
 				})
 
@@ -203,7 +208,7 @@ export class NowPlayingFooter extends React.Component
 						{ this.state.nowPlayingName }
 					</div>
 					<div className="btn-group text-right col-auto mb-2" role="group" aria-label="Basic example">
-						<button type="button" className="btn" onClick={ this.clearQueue }>
+						<button disabled type="button" className="btn" onClick={ this.clearQueue } >
 							<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x-circle-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
 								<path fillRule="evenodd" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
 							</svg>
@@ -227,7 +232,7 @@ export class NowPlayingFooter extends React.Component
 								<path d="M8.404 8.697l6.363 3.692c.54.313 1.233-.066 1.233-.697V4.308c0-.63-.693-1.01-1.233-.696L8.404 7.304a.802.802 0 0 0 0 1.393z" />
 							</svg>
 						</button>
-						{ this.state.playButtonStatus }
+						{ this.state.playButtonStatus ? this.state.playButton : this.state.pauseButton }
 
 						<button type="button" className="btn" onClick={ this.next }>
 							<svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-skip-forward-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
