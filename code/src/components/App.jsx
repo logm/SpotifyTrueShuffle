@@ -9,8 +9,14 @@ export default class App extends React.Component
 		super(props)
 		this.handle_client_id_change = this.handle_client_id_change.bind(this)
 		this.check_is_auth = this.check_is_auth.bind(this)
+		let init_id = ''
+		if (localStorage.client_id)
+		{
+			init_id = localStorage.client_id
+		}
 		this.state = {
-			client_id: "",
+			auth: '',
+			client_id: init_id,
 			is_auth: false
 		}
 	}
@@ -34,6 +40,7 @@ export default class App extends React.Component
 			this.setState({ auth: localStorage.auth })
 			this.setState({ client_id: localStorage.client_id })
 			this.setState({ is_auth: true })
+
 			return true
 		} else
 		{

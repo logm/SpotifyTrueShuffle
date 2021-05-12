@@ -113,7 +113,7 @@ export class Playlists extends React.Component
 	render()
 	{
 		return (
-			<div className="card-deck" id="playlist_list">
+			<div className="card-deck" >
 				{ this.props.playlists.map((p) =>
 				{
 					return (
@@ -149,7 +149,7 @@ export class Playlist extends React.Component
 	{
 
 		return (
-			<div className={ `card card-block playlist_card col-5 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } id={ this.props.id } onClick={ this.handleClick }>
+			<div className={ `card card-block playlist_card col-5 col-sm-4 col-md-3 col-lg-2 col-xxl-1 text-truncate ${this.state.active ? "playlist_card_active" : "playlist_card_inactive"}` } onClick={ this.handleClick }>
 				<img src={ this.props.artwork } className="card-img-top border-0" alt="..." />
 				<div className="card-body">
 					<h5 className="card-title">{ this.props.name }</h5>
@@ -168,7 +168,7 @@ export class SongList extends React.Component
 	render()
 	{
 		return (
-			<div className="col-sm" id="selected_song_list">
+			<div className="col-sm selected_song_list">
 				{ Array.from(this.props.songs).map((s) =>
 				{
 					return (

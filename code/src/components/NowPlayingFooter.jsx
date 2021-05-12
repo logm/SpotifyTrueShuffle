@@ -19,6 +19,7 @@ export class NowPlayingFooter extends React.Component
 		this.clearQueue = this.clearQueue.bind(this)
 		this.addToQueue = this.addToQueue.bind(this)
 		this.updateFooter = this.updateFooter.bind(this)
+		this.spotifyExceptions = this.spotifyExceptions.bind(this)
 
 		var playButton = (
 			<button type="button" className="btn btn-block bi bi-pause-fill spotify-buttons" onClick={ this.pause }>
@@ -34,7 +35,7 @@ export class NowPlayingFooter extends React.Component
 		this.state = {
 			nowPlayingName: "Not Playing",
 			nowPlayingWidth: '0%',
-			playButtonStatus: playButton,
+			playButtonStatus: true,
 			playButton: playButton,
 			pauseButton: pauseButton,
 		}
@@ -57,14 +58,14 @@ export class NowPlayingFooter extends React.Component
 	next()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null)
+		post(url, null, null).catch(e => this.spotifyExceptions(e))
 
 	}
 
 	previous()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null)
+		post(url, null, null).catch(e => this.spotifyExceptions(e))
 
 	}
 
@@ -72,18 +73,12 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("pause")
 		let url = "https://api.spotify.com/v1/me/player/pause"
-		try
-		{
-			put(url, null, null)
-			this.setState({
-				playButtonStatus: this.state.pauseButton
-			})
-		} catch (error)
-		{
-			console.log("asd")
-			console.log(error + " pause error")
-			// throw error
-		}
+
+		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		this.setState({
+			playButtonStatus: true
+		})
+
 	}
 
 
@@ -91,18 +86,11 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("play")
 		let url = "https://api.spotify.com/v1/me/player/play"
-		try
-		{
-			put(url, null, null)
-			this.setState({
-				playButtonStatus: this.state.playButton
-			})
-		} catch (error)
-		{
-			console.log("fgd")
-			throw error
-			// if (error instanceof )
-		}
+		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		this.setState({
+			playButtonStatus: false
+		})
+
 	}
 
 
@@ -133,6 +121,23 @@ export class NowPlayingFooter extends React.Component
 		console.log("adding to queue")
 	}
 
+	spotifyExceptions(exception)
+	{
+		console.log("spotifyExceptions")
+		console.log(exception)
+
+		if (exception === "Player command failed: No active device found")
+		{
+			console.log("player not found")
+			//do a popup to prompt user for device selection
+		} else
+		{
+			console.log("uncaught exception" + exception)
+			throw exception
+		}
+
+	}
+
 
 	async updateFooter()
 	{
@@ -142,7 +147,7 @@ export class NowPlayingFooter extends React.Component
 		let width = this.state.width
 		try
 		{
-			playback = await get(url, null, null)
+			playback = await get(url, null, null).catch(e => this.spotifyExceptions(e))
 			width = playback.progress_ms / playback.item.duration_ms * 100
 			width = width + '%'
 			this.setState({
@@ -158,7 +163,7 @@ export class NowPlayingFooter extends React.Component
 				//TODO: change delay to reduce api calls
 				// console.log("Type error in update updateFooter")
 				this.setState({
-					playButtonStatus: this.state.pauseButton,
+					playButtonStatus: false,
 					nowPlayingName: "Not Playing"
 				})
 
@@ -209,14 +214,11 @@ export class NowPlayingFooter extends React.Component
 						</button>
 						<button type="button" className="btn btn-block bi bi-skip-backward-fill spotify-buttons" onClick={ this.previous }>
 						</button>
-						{ this.state.playButtonStatus }
+						{ this.state.playButtonStatus ? this.state.playButton : this.state.pauseButton }
 						<button type="button" className="btn btn-block bi bi-skip-forward-fill spotify-buttons" onClick={ this.next }>
 						</button>
 					</div>
 				</div>
-				<button type="button" class="btn btn-secondary" data-container="body" data-toggle="popover" data-placement="left" data-content="Left popover">
-					Popover on left
-				</button>
 			</footer>
 
 		)
