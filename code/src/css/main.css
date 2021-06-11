@@ -122,3 +122,7 @@ body::-webkit-scrollbar {
 	font-size: large;
 
 }
+
+.modal-content {
+	background: var(--spotify-grey);
+}

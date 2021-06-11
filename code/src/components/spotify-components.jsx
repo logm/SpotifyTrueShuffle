@@ -1,5 +1,5 @@
 import React from 'react'
-import { get, post } from '../js/httpRequests'
+import { get, post, spotifyExceptions } from '../js/httpRequests'
 import { NowPlayingFooter } from './NowPlayingFooter'
 
 
@@ -11,11 +11,17 @@ export class Main extends React.Component
 		super(props)
 		this.getPlaylists = this.getPlaylists.bind(this)
 		this.selectedPlaylist = this.selectedPlaylist.bind(this)
+		this.shuffle = this.shuffle.bind(this)
+		this.addToQueue = this.addToQueue.bind(this)
+		this.addToQueueNumHandler = this.addToQueueNumHandler.bind(this)
 		this.state = {
 			playlists: [],
 			username: "loading",
 			selectedPlaylists: new Set(),
 			songs: new Set(),
+			queuedSongIndex: 0,
+			addToQueueNum: 0
+
 		}
 	}
 
@@ -86,6 +92,63 @@ export class Main extends React.Component
 		console.log(info)
 	}
 
+	shuffle()
+	{
+		console.log("shuffling")
+		let tmpList = Array.from(this.state.songs)
+		for (let i = tmpList.length - 1; i >= 0; i--)
+		{
+			const j = Math.floor(Math.random() * (i + 1))
+			const temp = tmpList[i]
+			tmpList[i] = tmpList[j]
+			tmpList[j] = temp
+		}
+		let tmpSet = new Set(tmpList)
+		this.setState({
+			songs: tmpSet,
+			queuedSongIndex: 0
+		})
+	}
+
+
+	async addToQueue()
+	{
+		let maxIndex = this.state.addToQueueNum === 0 ? this.state.songs.size : this.state.addToQueueNum
+		if (this.state.songs.length === 0)
+		{
+			return
+		}
+		for (let i = this.state.queuedSongIndex; i < maxIndex; i++)
+		{
+			if (i >= this.state.songs.length)
+			{
+				break
+			}
+			let song = Array.from(this.state.songs)[i]
+			if (!song.is_local)
+			{
+				let url = 'https://api.spotify.com/v1/me/player/queue?uri=spotify%3Atrack%3A' + song.track.id
+
+				await post(url, null, null).catch(e => spotifyExceptions(e))
+				this.setState({
+					queuedSongIndex: this.state.queuedSongIndex + 1
+				})
+
+			} else
+			{
+				console.log("cant play local song")
+			}
+		}
+	}
+
+	addToQueueNumHandler(num)
+	{
+		this.setState({
+			addToQueueNum: parseInt(num)
+		})
+	}
+
+
 	render()
 	{
 		return (
@@ -101,7 +164,7 @@ export class Main extends React.Component
 						<SongList songs={ this.state.songs } />
 					</div>
 				</div>
-				<NowPlayingFooter />
+				<NowPlayingFooter addToQueueNumHandler={ this.addToQueueNumHandler } addToQueue={ this.addToQueue } addToQueueNum={ this.addToQueueNum } shuffle={ this.shuffle } />
 			</div>
 
 		)

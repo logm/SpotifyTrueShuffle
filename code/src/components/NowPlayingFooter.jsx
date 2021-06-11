@@ -1,5 +1,6 @@
 import React from 'react'
-import { get, post, put } from '../js/httpRequests'
+import { get, post, put, spotifyExceptions } from '../js/httpRequests'
+import $ from 'jquery'
 
 
 
@@ -15,11 +16,10 @@ export class NowPlayingFooter extends React.Component
 		this.previous = this.previous.bind(this)
 		this.pause = this.pause.bind(this)
 		this.play = this.play.bind(this)
-		this.shuffle = this.shuffle.bind(this)
 		this.clearQueue = this.clearQueue.bind(this)
-		this.addToQueue = this.addToQueue.bind(this)
 		this.updateFooter = this.updateFooter.bind(this)
-		this.spotifyExceptions = this.spotifyExceptions.bind(this)
+		this.handleModalShowClick = this.handleModalShowClick.bind(this)
+		this.handleModalCloseClick = this.handleModalCloseClick.bind(this)
 
 		var playButton = (
 			<button type="button" className="btn btn-block bi bi-pause-fill spotify-buttons" onClick={ this.pause }>
@@ -38,6 +38,7 @@ export class NowPlayingFooter extends React.Component
 			playButtonStatus: true,
 			playButton: playButton,
 			pauseButton: pauseButton,
+			showModal: false
 		}
 	}
 
@@ -58,14 +59,14 @@ export class NowPlayingFooter extends React.Component
 	next()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null).catch(e => this.spotifyExceptions(e))
+		post(url, null, null).catch(e => spotifyExceptions(e))
 
 	}
 
 	previous()
 	{
 		let url = "https://api.spotify.com/v1/me/player/next"
-		post(url, null, null).catch(e => this.spotifyExceptions(e))
+		post(url, null, null).catch(e => spotifyExceptions(e))
 
 	}
 
@@ -74,7 +75,7 @@ export class NowPlayingFooter extends React.Component
 		console.log("pause")
 		let url = "https://api.spotify.com/v1/me/player/pause"
 
-		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		put(url, null, null).catch(e => spotifyExceptions(e))
 		this.setState({
 			playButtonStatus: true
 		})
@@ -86,7 +87,7 @@ export class NowPlayingFooter extends React.Component
 	{
 		console.log("play")
 		let url = "https://api.spotify.com/v1/me/player/play"
-		put(url, null, null).catch(e => this.spotifyExceptions(e))
+		put(url, null, null).catch(e => spotifyExceptions(e))
 		this.setState({
 			playButtonStatus: false
 		})
@@ -95,20 +96,7 @@ export class NowPlayingFooter extends React.Component
 
 
 
-	shuffle()
-	{
-		console.log("shuffling")
-		// for (let i = selectedSongs.length - 1; i >= 0; i--)
-		// {
-		// 	const j = Math.floor(Math.random() * (i + 1));
-		// 	const temp = selectedSongs[i];
-		// 	selectedSongs[i] = selectedSongs[j];
-		// 	selectedSongs[j] = temp;
-		// }
-		// console.log(selectedSongs)
-		// viewSongs()
-		// console.log("done shuffling")
-	}
+
 
 
 	async clearQueue()
@@ -116,38 +104,36 @@ export class NowPlayingFooter extends React.Component
 		console.log("clearing")
 	}
 
-	async addToQueue()
+
+
+
+	handleModalShowClick(e)
 	{
-		console.log("adding to queue")
+		e.preventDefault()
+		this.setState({
+			showModal: true
+		})
 	}
 
-	spotifyExceptions(exception)
+	handleModalCloseClick()
 	{
-		console.log("spotifyExceptions")
-		console.log(exception)
-
-		if (exception === "Player command failed: No active device found")
-		{
-			console.log("player not found")
-			//do a popup to prompt user for device selection
-		} else
-		{
-			console.log("uncaught exception" + exception)
-			throw exception
-		}
-
+		this.setState({
+			showModal: false
+		})
 	}
+
+
+
 
 
 	async updateFooter()
 	{
-		console.log("now playing request")
 		let url = "https://api.spotify.com/v1/me/player/currently-playing"
 		let playback = null
 		let width = this.state.width
 		try
 		{
-			playback = await get(url, null, null).catch(e => this.spotifyExceptions(e))
+			playback = await get(url, null, null).catch(e => spotifyExceptions(e))
 			width = playback.progress_ms / playback.item.duration_ms * 100
 			width = width + '%'
 			this.setState({
@@ -183,8 +169,7 @@ export class NowPlayingFooter extends React.Component
 
 	componentDidMount()
 	{
-		console.log("componentDidMount")
-		this.interval = setInterval(() => this.updateFooter(), 1000)
+		this.interval = setInterval(() => this.updateFooter(), 2000)
 	}
 	componentWillUnmount()
 	{
@@ -195,7 +180,8 @@ export class NowPlayingFooter extends React.Component
 
 	render()
 	{
-		return (
+		return (<div>
+			{ this.state.showModal ? (<Modal handleModalCloseClick={ this.handleModalCloseClick } addToQueueNumHandler={ this.props.addToQueueNumHandler } />) : null }
 			<footer className="container fixed-bottom footer-area">
 				<div className="progress m-1">
 					<div className="progress-bar now_playing_progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" style={ { width: this.state.nowPlayingWidth } }></div>
@@ -205,12 +191,12 @@ export class NowPlayingFooter extends React.Component
 						{ this.state.nowPlayingName }
 					</div>
 					<div className="btn-group text-right col-md-4 col-lg-3 col-sm-12 col-xs-12 mb-2 " role="group">
-
-						<button type="button" className="btn btn-block bi bi-x-circle-fill  spotify-buttons" onClick={ this.clearQueue }>
+						<button type="button" className="btn btn-block bi bi-three-dots spotify-buttons" onClick={ this.handleModalShowClick }>
 						</button>
-						<button type="button" className="btn btn-block bi bi-box-arrow-down spotify-buttons" onClick={ this.addToQueue }>
+						{/* <button type="button" className="btn btn-block bi bi-x-circle-fill  spotify-buttons" onClick={ this.clearQueue }></button> */ }
+						<button type="button" className="btn btn-block bi bi-plus-square spotify-buttons" onClick={ this.props.addToQueue }>
 						</button>
-						<button type="button" className="btn btn-block bi bi-shuffle spotify-buttons" onClick={ this.shuffle }>
+						<button type="button" className="btn btn-block bi bi-shuffle spotify-buttons" onClick={ this.props.shuffle }>
 						</button>
 						<button type="button" className="btn btn-block bi bi-skip-backward-fill spotify-buttons" onClick={ this.previous }>
 						</button>
@@ -219,9 +205,110 @@ export class NowPlayingFooter extends React.Component
 						</button>
 					</div>
 				</div>
-			</footer>
+			</footer >
+		</div>
 
 		)
 
+	}
+}
+
+
+class Modal extends React.Component
+{
+	constructor (props)
+	{
+		super(props)
+		this.handleCloseClick = this.handleCloseClick.bind(this)
+		this.handleRangeSlider = this.handleRangeSlider.bind(this)
+		this.getDeviceList = this.getDeviceList.bind(this)
+		this.handleQueueNumSelector = this.handleQueueNumSelector.bind(this)
+		this.handleDeviceInput = this.handleDeviceInput.bind(this)
+
+		this.state = {
+			rangeSliderValue: 2,
+			devices: [],
+			savedDeviceID: '',
+			savedAddToQueueNum: ''
+		}
+	}
+	componentDidMount()
+	{
+		this.getDeviceList()
+		const { handleModalCloseClick } = this.props
+		$(this.modal).modal('show')
+		$(this.modal).on('hidden.bs.modal', handleModalCloseClick)
+
+	}
+	handleCloseClick()
+	{
+		const { handleModalCloseClick } = this.props
+		$(this.modal).modal('hide')
+		handleModalCloseClick()
+		this.props.addToQueueNumHandler(this.state.savedAddToQueueNum)
+
+	}
+
+	handleRangeSlider(event)
+	{
+		this.setState({ rangeSliderValue: event.target.value })
+	}
+
+
+	async getDeviceList()
+	{
+		let url = "https://api.spotify.com/v1/me/player/devices"
+		let deviceList = await get(url, null, null)
+		this.setState({
+			devices: deviceList.devices
+		})
+	}
+
+	handleDeviceInput(event)
+	{
+		this.setState({ savedDeviceID: event.target.value })
+	}
+
+	handleQueueNumSelector(event)
+	{
+		this.setState({ savedAddToQueueNum: event.target.value })
+	}
+
+
+	render()
+	{
+		return (
+			<div>
+				<div className="modal fade " ref={ modal => this.modal = modal } id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					<div className="modal-dialog" role="document">
+						<div className="modal-content">
+							<div className="modal-body">
+								<div className="form-group">
+									Device Selector
+									<select className="custom-select form-control" multiple onChange={ this.handleDeviceInput }>
+										{ this.state.devices.map((d) =>
+										{
+											return (
+												<option key={ d.id } value={ d.id } selected={ (d.is_active) ? "selected" : "" }>{ d.name }</option>
+											)
+										})
+										}
+									</select>
+									<label for="queueSelector">Number of songs to add to queue: <em> (0=all)</em></label>
+									<input type="number" className="form-control" id="queueSelector" name="tentacles" min="0" max="25" onChange={ this.handleQueueNumSelector }></input>
+									{/* <label for="customRange3">Example range</label>
+								<input type="range" className="custom-range" min="0" max="5" step="1" id="customRange3" value={ this.state.rangeSliderValue } onChange={ this.handleRangeSlider }></input>
+								{ this.state.rangeSliderValue } */}
+									{/* Clear Queue Nutton */ }
+								</div>
+							</div>
+							<div className="modal-footer">
+								<button type="button" className="btn btn-secondary" onClick={ this.handleCloseClick }>Save</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div >
+		)
 	}
 }
